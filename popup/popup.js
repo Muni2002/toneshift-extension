@@ -1,14 +1,14 @@
-// Import api.js functions via message passing
 document.addEventListener("DOMContentLoaded", async () => {
-  const apiKeyInput = document.getElementById("api-key-input");
-  const saveKeyBtn = document.getElementById("save-key-btn");
-  const rewriteBtn = document.getElementById("rewrite-btn");
-  const inputText = document.getElementById("input-text");
-  const outputText = document.getElementById("output-text");
-  const outputSection = document.getElementById("output-section");
-  const copyBtn = document.getElementById("copy-btn");
-  const statusMsg = document.getElementById("status-msg");
-  const toneBtns = document.querySelectorAll(".tone-btn");
+  const apiKeyInput  = document.getElementById("api-key-input");
+  const saveKeyBtn   = document.getElementById("save-key-btn");
+  const rewriteBtn   = document.getElementById("rewrite-btn");
+  const inputText    = document.getElementById("input-text");
+  const outputText   = document.getElementById("output-text");
+  const outputSection= document.getElementById("output-section");
+  const copyBtn      = document.getElementById("copy-btn");
+  const statusMsg    = document.getElementById("status-msg");
+  const charCount    = document.getElementById("char-count");
+  const toneBtns     = document.querySelectorAll(".tone-btn");
 
   let selectedTone = "formal";
 
@@ -19,16 +19,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
+  // Character counter
+  inputText.addEventListener("input", () => {
+    const len = inputText.value.length;
+    charCount.textContent = `${len} / 500`;
+    charCount.style.color = len > 450 ? "#e74c3c" : "#aaa";
+  });
+
   // Check for pending rewrite from context menu
   chrome.storage.local.get(["pending_rewrite"], (result) => {
     if (result.pending_rewrite && result.pending_rewrite.status === "pending") {
       inputText.value = result.pending_rewrite.text;
+      charCount.textContent = `${inputText.value.length} / 500`;
       selectedTone = result.pending_rewrite.tone;
       toneBtns.forEach(btn => {
         btn.classList.toggle("active", btn.dataset.tone === selectedTone);
       });
       chrome.storage.local.remove("pending_rewrite");
-      // Auto rewrite
       handleRewrite();
     }
   });
@@ -45,12 +52,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Save API key
   saveKeyBtn.addEventListener("click", () => {
     const key = apiKeyInput.value.trim();
-    if (!key) {
-      showStatus("Please enter an API key", true);
-      return;
-    }
+    if (!key) { showStatus("Please enter an API key", true); return; }
     chrome.storage.local.set({ groq_api_key: key }, () => {
-      showStatus("API key saved!");
+      showStatus("✅ API key saved!");
     });
   });
 
@@ -59,31 +63,27 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   async function handleRewrite() {
     const text = inputText.value.trim();
-    if (!text) {
-      showStatus("Please enter some text first", true);
-      return;
-    }
+    if (!text) { showStatus("Please enter some text first", true); return; }
 
     const apiKey = apiKeyInput.value.trim();
-    if (!apiKey) {
-      showStatus("Please add your Groq API key first", true);
-      return;
-    }
+    if (!apiKey) { showStatus("Please add your Groq API key first", true); return; }
 
+    // Show loading state
     rewriteBtn.disabled = true;
-    rewriteBtn.textContent = "✨ Rewriting...";
+    rewriteBtn.innerHTML = '<span class="spinner"></span> Rewriting...';
+    outputSection.style.display = "none";
     showStatus("");
 
     try {
       const result = await callGroqAPI(text, selectedTone, apiKey);
       outputText.value = result;
       outputSection.style.display = "block";
-      showStatus("Done!");
+      showStatus("✨ Done!");
     } catch (error) {
       showStatus(error.message, true);
     } finally {
       rewriteBtn.disabled = false;
-      rewriteBtn.textContent = "✨ Rewrite";
+      rewriteBtn.innerHTML = "✨ Rewrite";
     }
   }
 
@@ -91,9 +91,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   copyBtn.addEventListener("click", () => {
     navigator.clipboard.writeText(outputText.value).then(() => {
       copyBtn.textContent = "✅ Copied!";
-      setTimeout(() => {
-        copyBtn.textContent = "📋 Copy to Clipboard";
-      }, 2000);
+      setTimeout(() => { copyBtn.textContent = "📋 Copy to Clipboard"; }, 2000);
     });
   });
 

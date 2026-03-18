@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ToneShift</title>
-  <link rel="stylesheet" href="popup.css" />
+  <link rel="stylesheet" href="popup.css"/>
 </head>
 <body>
 
@@ -14,48 +14,53 @@
     <span class="tagline">Rewrite in any tone</span>
   </div>
 
-  <!-- API Key Section -->
-  <div class="section" id="api-key-section">
-    <label>Groq API Key</label>
-    <div class="input-row">
-      <input type="password" id="api-key-input" placeholder="Enter your Groq API key..." />
-      <button id="save-key-btn">Save</button>
+  <div class="content">
+
+    <!-- API Key -->
+    <div class="api-section">
+      <label>Groq API Key</label>
+      <div class="input-row">
+        <input type="password" id="api-key-input" placeholder="Paste your gsk_... key here"/>
+        <button class="save-btn" id="save-key-btn">Save</button>
+      </div>
+      <a href="https://console.groq.com" target="_blank" rel="noopener" class="api-link">
+        🔑 Get free API key →
+      </a>
     </div>
-    <a href="https://console.groq.com" target="_blank" class="link">
-      Get free API key →
-    </a>
-  </div>
 
-  <!-- Tone Selector -->
-  <div class="section">
-    <label>Select Tone</label>
-    <div class="tone-grid">
-      <button class="tone-btn active" data-tone="formal">🎩 Formal</button>
-      <button class="tone-btn" data-tone="casual">😎 Casual</button>
-      <button class="tone-btn" data-tone="friendly">😊 Friendly</button>
-      <button class="tone-btn" data-tone="persuasive">💪 Persuasive</button>
+    <!-- Tone Selector -->
+    <div class="tone-section">
+      <label>Select Tone</label>
+      <div class="tone-grid">
+        <button class="tone-btn active" data-tone="formal">🎩 Formal</button>
+        <button class="tone-btn" data-tone="casual">😎 Casual</button>
+        <button class="tone-btn" data-tone="friendly">😊 Friendly</button>
+        <button class="tone-btn" data-tone="persuasive">💪 Persuasive</button>
+      </div>
     </div>
+
+    <!-- Input -->
+    <div class="input-section">
+      <label>Your Text</label>
+      <div class="textarea-wrapper">
+        <textarea id="input-text" placeholder="Select text on any webpage, or type here..."></textarea>
+        <span class="char-count" id="char-count">0 / 500</span>
+      </div>
+    </div>
+
+    <!-- Rewrite Button -->
+    <button class="rewrite-btn" id="rewrite-btn">✨ Rewrite</button>
+
+    <!-- Result -->
+    <div class="result-section" id="output-section" style="display:none;">
+      <label>✅ Result</label>
+      <textarea id="output-text" readonly></textarea>
+      <button class="copy-btn" id="copy-btn">📋 Copy to Clipboard</button>
+    </div>
+
   </div>
 
-  <!-- Input Text -->
-  <div class="section">
-    <label>Your Text</label>
-    <textarea id="input-text" placeholder="Select text on any webpage, or type here..."></textarea>
-  </div>
-
-  <!-- Rewrite Button -->
-  <button id="rewrite-btn" class="primary-btn">
-    ✨ Rewrite
-  </button>
-
-  <!-- Output -->
-  <div class="section" id="output-section" style="display:none;">
-    <label>Result</label>
-    <textarea id="output-text" readonly></textarea>
-    <button id="copy-btn" class="copy-btn">📋 Copy to Clipboard</button>
-  </div>
-
-  <!-- Status message -->
+  <!-- Status -->
   <div id="status-msg" class="status"></div>
 
   <script src="popup.js"></script>
